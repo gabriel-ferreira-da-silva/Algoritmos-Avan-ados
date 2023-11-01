@@ -1,18 +1,29 @@
 #include<iostream>
-#include "minstack.h"
-
-using namespace std;
+#include "minstack-minqueue.h"
 
 int main(){
     Minstack ms;
-    printf("\n hello\n");
-    ms.push(10);
-    printf("\n%d\n", ms.stack[0]);
-    ms.push(44);
-    printf("\n%d\n", ms.stack[ms.stack.size()-1].min->val);
-    ms.push(2);
-    printf("\n%d\n", ms.showMin());
-    ms.push(111);
-    printf("\n%d\n", ms.showMin());
+    Minqueue mq;
+
+    mq.enqueue(30);
+    mq.enqueue(5);
+    mq.enqueue(10);
+
+    printf("first: %d\n", mq.showFirst() );
+    printf("min: %d\n", mq.showMin() );
     
+    mq.dequeue();
+    mq.dequeue();
+    mq.enqueue(1);
+    mq.enqueue(100);
+
+    printf("first: %d\n", mq.showFirst() );
+    printf("min: %d\n", mq.showMin() );
+    
+    //printf("first: %d min: %d", mq.showFirst(), mq.showMin());
+
+
+    
+
+
 }
