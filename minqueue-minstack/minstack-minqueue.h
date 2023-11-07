@@ -1,4 +1,5 @@
 #include<iostream>
+#include<vector>
 
 class Node {
     public:
@@ -56,6 +57,8 @@ class Minstack {
 
 };
 
+
+
 class Minqueue{
     public:
         Minstack front, rear;
@@ -93,5 +96,74 @@ class Minqueue{
         }
 
 
+
+};
+
+class Minqueue_Arrdin{
+    public:
+        std::vector<long long int> A, M;
+
+        void enqueue(long long int value){
+            A.push_back(value);
+            while( M.size()> 0 && M.back() > value){
+                M.pop_back();
+            }
+            M.push_back( value );
+        }
+
+        long long int dequeue(){
+            long long int value = A[0];
+
+            if( M.size() > 0 && value == M[0]){
+                M.erase(M.begin());
+            }
+
+            if( A.size() > 0 ){
+                A.erase(A.begin());
+            }
+            
+        }
+
+        long long int min(){
+            return M[0];
+        }
+
+};
+
+class Minqueue_Arrdin_Index{
+    public:
+        std::vector<long long int> A, M;
+
+        void enqueue(long long int value){
+            A.push_back(value);
+            while( M.size() > 0 && A[M.back()] > value){
+                M.pop_back();
+            }
+            M.push_back( A.size() - 1 );
+        }
+
+        long long int dequeue(){
+            long long int value = A[0];
+
+            if( M.size() > 0 && value == A[M[0]]){
+                M.erase(M.begin());
+            }
+            
+            //  A OPERAÇÃO DE DEQUEUE É O(N) POR 
+            //  SER NECESSÁRIO ATUALIZAR OS IND-
+            //  CES DE M
+
+            if( A.size() > 0 ){
+                A.erase(A.begin());
+                for(int i=0; i < M.size() ; i++){
+                    M[i] -= 1;
+                }
+            }
+            
+        }
+
+        long long int min(){
+            return A[M[0]];
+        }
 
 };
