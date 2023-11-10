@@ -1,6 +1,6 @@
 #include<iostream>
 #include<vector>
-
+#include<deque>
 class Node {
     public:
         int val;
@@ -164,6 +164,54 @@ class Minqueue_Arrdin_Index{
 
         long long int min(){
             return A[M[0]];
+        }
+
+};
+
+
+class Minqueue_queue{
+    public:
+        std::deque<unsigned long int> V,M;
+
+        void enqueue(unsigned long int val){
+            V.push_back(val);
+            while( M.size() > 0 && V[M.back()] > val){
+                M.pop_back();
+            }
+            M.push_back(V.size()-1);
+        }
+
+        unsigned long int dequeue(){
+            if(V.size()>0){
+                unsigned long int val = V[0];
+                V.pop_front();
+                if( 0 == M.front()){
+                    M.pop_front();
+                }
+                for(unsigned long int i=0 ; i < M.size() ; i++){
+                    M[i] = M[i]-1;
+                }
+                return val;
+
+            }
+            return 0;
+        }
+
+        void show(){
+
+            std::cout << "V: \n";
+            for(int i =0; i < V.size() ; i++){
+                std::cout << V[i] << " ";
+            }
+            std::cout << "\nM: \n";
+            for(int i =0; i < M.size() ; i++){
+                std::cout << M[i] << " ";
+            }
+            std::cout << "\nV[M]: \n";
+            for(int i =0; i < M.size() ; i++){
+                std::cout << V[M[i]] << " ";
+            }
+            std::cout <<"\n";
         }
 
 };
