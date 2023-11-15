@@ -1,25 +1,13 @@
 #include<iostream>
-#include<cmath>
 #include<vector>
+#include<cmath>
+// creates the pre processed table
 
-
-int mu(int (*func) (std::vector<int> F ,int start, int end),std::vector<int> F1 , std::vector<int> F2, int start, int end){
-    std::vector<int> ans;
-    for(int i=start; i < F1.size() ; i++){
-        ans.push_back(F1[i]);
-    }
-    for(int i=0; i < end ; i++){
-        ans.push_back(F2[i]);
-    }
-    return func(ans, 0,ans.size());
-}
-
-std::vector<std::vector<int>> preprocess(int neutro, std::vector<int> A, int (*func) (std::vector<int>, int, int)){
-    std::vector< std::vector<int> > table;
-    
+std::vector<std::vector<int>> createTable( int (*func) (std::vector<int> , int , int ) , int (*mu) (int,int),int neutro, std::vector<int> A ){
+    int m = (int) log2(A.size()) + 1;
     int n = A.size();
-    int m =  floor(log2(n)) + 1;
-    
+    std::vector<std::vector<int>> table;
+
     for(int i=0; i < m; i++){
         std::vector<int> column;
         for(int j=0; j < n ; j++){
@@ -28,26 +16,31 @@ std::vector<std::vector<int>> preprocess(int neutro, std::vector<int> A, int (*f
         table.push_back(column);        
     }
 
-    for(int i =0; i < n; i++){
-        table[0][i] = A[i];
+    for(int i=0; i < n; i++){
+        table[0][i] = func(A, i, i+1 );
     }
-
     int k=1;
-    for(int i=1; i<m; i++){
-        for(int j=0; j<n ; j++){
-            table[i][j] = func(table[i-1], j, j+k);        
+    for(int i=1; i < m; i++){
+        for(int j=0; j < n ; j++){
+            if(j+k < n){
+                table[i][j] = mu( table[i-1][j], table[i-1][j+k]);
+            }else{
+                table[i][j] = mu( table[i-1][j], neutro);
+            }
+            
         }
         k = k*2;
     }
-
-    
-    for(int i =0; i < m; i++){
-        for(int j=0; j < n ; j++){
-            std::cout << table[i][j] << " ";
-        }
-        std::cout<< "\n";
-    }
-
     return table;
 }
 
+
+int rangeQuery( std::vector<std::vector<int>> table, int (*mu) (int,int) , int neutro, int left, int right){
+    int ans=neutro;
+    while(left<right){
+        int i = log2(right -left);
+        ans = mu(ans, table[i][left]);
+        left = left + pow(2, i);
+    }
+    return ans;
+}
