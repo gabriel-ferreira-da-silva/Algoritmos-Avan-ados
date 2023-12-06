@@ -7,7 +7,8 @@ int main(){
     a.insert(&a, 2);
     a.insert(&a, 10);
     a.insert(&a, 13);
-    a.show(&a);
+    
+    std::cout << a.sucessor(&a, 4) << "\n";
 
 
 
