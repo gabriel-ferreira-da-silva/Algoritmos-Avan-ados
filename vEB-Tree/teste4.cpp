@@ -3,7 +3,7 @@
 
 int main(){
     vEBT a(256);
-
+    std::cout.flush();
     insert(&a, 2);
     insert(&a, 10);
     insert(&a, 13);
