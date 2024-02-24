@@ -42,53 +42,71 @@ class Skiplist{
 
         void insert(long int key, long int val){
             vector<Node*> p = precursors(key);
-            if(p[0]->next[0] != NULL && p[0]->next[0]->key == key){
-                p[0]->next[0]->val = val;
+            if(p[0]->next[0]!= NULL && p[0]->next[0]->key == key){
+                p[0]->next[0]->val=val;
                 return;
             }
-            long int h = random_height();
 
+            long int h=random_height();
             if(h > height){
-                for(long int i = height ; i < h ; i++){
-                    head->next[i] = NULL;
+                for(int i =height; i < h ;i++){
+                    head->next.push_back(NULL);
+                    head->height = head->next.size();
                 }
-                for(long int i = height ; i < h ; i++){
-                    p[i] = head;
+                for(int i =height; i < h ;i++){
+                    p.push_back(head);
                 }
                 height = h;
             }
 
-            Node* n =  new Node;
-            n->next.resize(h);
-            n->height=h;
+            Node* n = new Node();
+            vector<Node*> a(h, NULL);
+            n->height = h;
+            n->next = a;
             n->key = key;
             n->val = val;
-            for(long int l=0; l < h; l++){
+
+            for(int l =0; l<h;l++){
                 n->next[l] = p[l]->next[l];
                 p[l]->next[l] = n;
             }
+
         }
 
-        Node* search(long int key){
+        long int search(long int key){
             vector<Node*> p = precursors(key);
             if (p[0]->next[0] != NULL && p[0]->next[0]->key == key ){
-                return p[0]->next[0];
+                return p[0]->next[0]->val;
             }else{
-                return NULL;
+                return -1;
+            }
+        }
+
+        void remove(long int key){
+            vector<Node*> p = precursors(key);
+            
+            if(p[0]->next[0] == NULL || p[0]->next[0]->key != key){
+                return;
+            }
+            Node* n =  p[0]->next[0];
+            for(int l=0; l< height ; l++){
+                p[l]->next[l] = n->next[l];
+            }
+            while(height > 1 || head->next[height-1]==NULL){
+                height = height-1;
             }
         }
 
         void show(){
             cur = head;
             for(long int i=0; i < height; i++){
-                cur = head->next[i];
-                while(cur!=NULL){
-                    long int val = cur->val;
-                    cout << val<< " ";
+                while(cur->next[i]!=NULL){
+                    long int val = cur->next[i]->val;
+                    cout <<"v:" <<val<< "h:"<<cur->next[i]->height<<" ";
                     cur = cur->next[i];
                 }
-                cout << "\n ";
             }
+            cout << "\n";
         }
 
 
@@ -99,8 +117,37 @@ class Skiplist{
 
 int main(){
     Skiplist sl;
-    sl.insert(9,9);
-    vector<Node*> p = sl.precursors(3);
+    
+    sl.insert(1,1);
+    sl.insert(2,3);
+    sl.insert(3,5);
+    sl.insert(4,42);
+    sl.insert(5,14);
+    sl.insert(6,251);
+    sl.insert(7,41);
+    sl.insert(8,222);
+    sl.insert(9,25);
+    sl.insert(10,4513);
+    sl.insert(11,2612);
+
     sl.show();
-    printf("hello");
+
+    cout<< "search 4: " << sl.search(4);
+    cout<< "\nsearch 3: " << sl.search(3);
+    cout<< "\nsearch 10: " << sl.search(10);
+    cout<< "\nsearch 6: " << sl.search(6);
+    cout<<"\n";
+
+    sl.insert(1,1);
+    sl.insert(2,3);
+    sl.remove(4);
+    sl.remove(4);
+    sl.remove(10);
+
+    sl.show();
+    
+    cout<< "search 4: " << sl.search(4);
+    cout<< "\nsearch 3: " << sl.search(3);
+    cout<< "\nsearch 10: " << sl.search(10);
+    cout<< "\nsearch 6: " << sl.search(6);
 }
