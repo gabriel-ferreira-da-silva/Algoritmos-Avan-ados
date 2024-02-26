@@ -1,8 +1,5 @@
 #include<iostream>
 #include<vector>
-#include <bits/stdc++.h>
-#include <algorithm>
-
 using namespace std;
 
 class Node{
@@ -33,7 +30,7 @@ class Skiplist{
             for(long int l = height-1; l >= 0 ; l--){
                 while(cur->next[l] != NULL && cur->next[l]->key < key){
                     cur = cur->next[l];
-                }               
+                }
                 P[l] = cur;
             }
             return P;
