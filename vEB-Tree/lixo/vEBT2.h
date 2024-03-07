@@ -18,9 +18,8 @@ class vEBT{
             u=size;
             summary = new vEBT(sqrt(size));
             cluster = std::vector<vEBT*>(sqrt(size), nullptr);
-            
-
         }
+        
         void insert(vEBT* v , long int x){
             if(x==v->min || x==v->max ){
                 return;
