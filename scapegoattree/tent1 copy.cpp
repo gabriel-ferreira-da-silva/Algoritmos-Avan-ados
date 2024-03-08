@@ -3,6 +3,13 @@
 #include<vector>
 using namespace std;
 
+
+#define A 1664525
+#define C 1013904223
+#define R 4294967296
+
+long long int d1,d2;
+
 class Node{
     public:
         Node *left, *right;
@@ -165,14 +172,21 @@ Node* flat(Node* root){
 */
 Node* rebuild(Node* root, long long int n){
     Node *dummy = new Node;
+    //Node *head = flatten(root, dummy);
     Node *head=NULL;
     head = flat(root, head);
+    /*cout<<"flat: ";
+    show(head);
+    cout<<"\n";*/
     Node *res = (build(head, universal));
+    /*cout<<"rebuild noleft: ";
+    show(res);
+    cout<<"\n";*/
     return res->left;
 }
 
 long long int halpha(double alpha, long long int n){
-    return (long long int) floor( log(n) / log(1/alpha));
+    return (long long int) floor( log((double) n) / log(1/alpha));
 }
 
 int unbalanced(double alpha, long long int n, long long int i){
@@ -192,9 +206,6 @@ class res{
 };
 res sgins(Node* root, long long int depth, long long int n, double alpha, long long int key){
     res r;
-    cout<<"  n = "<<n<<"\n";
-    cout<<"  key = "<<key<<"\n";
-    cout<<"  depth ="<<depth<<"\n";
     long long nroot;
     if(root==NULL){
         Node *node = new Node;
@@ -207,6 +218,7 @@ res sgins(Node* root, long long int depth, long long int n, double alpha, long l
         r.dis =0;
         return r;
     }else if(root->key == key){
+        d1=-1;
         r.node =root;
         r.n_node=0;
         r.tam=-1;
@@ -214,21 +226,22 @@ res sgins(Node* root, long long int depth, long long int n, double alpha, long l
         r.dis=-1;
         return r;
     }else if(key < root->key){
+        d1++;
         r  = sgins(root->left, depth+1, n , alpha, key);
         root->left = r.node;
         nroot = r.rebuild!=0? 1 + r.tam + dfscount(root->right) : -1;
     }else{
+        d1++;
         r  = sgins(root->right, depth+1, n , alpha, key);
         root->right = r.node;
         nroot = r.rebuild!=0? 1 + r.tam + dfscount(root->left) : -1;
     }
     r.dis = r.dis+1;
     if(r.rebuild && unbalanced(alpha, nroot, r.dis)){
-        cout<<" rb::\n";
-        cout<<"  n = "<<n<<"\n";
-        cout<<"  key = "<<key<<"\n";
-        cout<<"  depth ="<<depth<<"\n";
-        cout<<"  nroot ="<<nroot<<"\n---rb\n";
+        /*cout<<"\n\nrebuilding: ";
+        show(root);
+        cout<<"\nre\n";*/
+        cout<<"R";
         r.node = rebuild(root, nroot);
         r.n_node = r.n_node;
         r.tam = nroot;
@@ -248,6 +261,7 @@ res sgins(Node* root, long long int depth, long long int n, double alpha, long l
 }
 
 void sginsert(Tree *t, long long int key){
+    d1=0;
     res r = sgins(t->root, 0, t->size, t->alpha, key);
     t->root = r.node;
     t->size = t->size + r.n_node;
@@ -278,36 +292,83 @@ void flatten1(Node* root)
     // now call the same function for root->right
     flatten1(root->right);
 }
+class Rng{
+    public:
+        long long int x;
 
-
-int count(vector<long long int> v, long long int s){
-    for(int i=0;i<v.size();i++){
-        if(v[i]==s){
-            return 0;
+        long long int next(){
+            long long int s= x;
+            x = (A*x + C) % R;
+            return s;
         }
+    
+};
+
+long long d3;
+
+void query(Node *root, long long int key){
+    if(root==NULL){
+        d3=0;
+        return;
     }
-    return 1;
+    if(root->key==key){
+        d3=-1;
+        return;
+    }
+    d2++;
+    if(root->key < key){
+        query(root->right, key);
+    }else{
+        query(root->left, key);
+    }
 }
+
+void sgquery(Tree* sg, long long int key){
+    d2=0;
+    query(sg->root, key);
+}
+
 int main(){
-
-    Tree t;
-    long long int s=123;
-    t.alpha = 0.5;
-    vector<long long int> v;
-    for(int i=0; i<20;i++){
-        s= (144444417*s + 391715171 )% 100;
-        if(count(v, s)){
-            v.push_back(s);
-            //cout<<s<<" ";
-        }
-        sginsert(&t,s);
+    long long int S,U,B,N,I,Q,P;
+    double alpha;
+    
+    scanf(" %lld", &S);
+    scanf(" %lld", &U);
+    scanf(" %lf", &alpha);
+    scanf(" %lld", &B);
+    scanf(" %lld", &N);
+    scanf(" %lld", &I);
+    scanf(" %lld", &Q);
+    scanf(" %lld", &P);
+    
+    Rng  rng;
+    rng.x = S;
+    Tree sg;
+    sg.alpha = alpha;
+    //cout<<sg.alpha<<"\n";
+    for(long long int i=0 ; i < B ; i++){
+        sginsert(&sg, rng.next()%U);
     }
-    cout<<"\n\n";
-    show(t.root);
+    long long int x,y;
+    for(long long int i=0; i < N; i++){
+        x = rng.next()%(I+Q);
+        if( x < I){
+            y = rng.next() % U;
+            
+            sgquery(&sg, y);
+            sginsert(&sg, y);
+            /*if(d1<0 ||d2<0){
+                d1=d2=-1;
+            }*/
+            if(i%P==0){
+                cout<<"I "<<y<<" "<<d2<<" "<<d1<<" "<<d3<<"\n"; 
+            }
+        }else{
+            y = rng.next() % U;
+            sgquery(&sg, y);
+            if(i%P==0){
+                cout<<"Q "<<y<<" "<<d2<<"\n";
+            }
+        }
+    }
 }
-/*
-36 22 3 2 16 5 25 23 63 45 42 43 62 56 76 65 82 
-63 36 16 3 2 5 23 22 25 45 42 43 62 56 83 76 65 82 96 85
-36 22 3 2 16 5 25 23 63 45 42 43 62 56 76 65 82 
-
-*/

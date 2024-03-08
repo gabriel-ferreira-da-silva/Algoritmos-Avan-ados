@@ -4,6 +4,9 @@
 using namespace std;
 
 
+#define A 1664525
+#define C 1013904223
+#define R 4294967296
 class Node{
     public:
         long long int key;
@@ -14,6 +17,8 @@ class Node{
             right = NULL;
         }
 };
+
+long int d1,d2;
 
 class res{
     public:
@@ -39,7 +44,7 @@ long long int halpha( long long int n,double alpha){
     /*cout<<"\nhalpha:\n";
     cout<<"alpha:"<<alpha<<"\n";
     cout<<"result:"<< (long long int) floor((log( (double) n) / log( 1/alpha))) <<"\n";*/
-    return (long long int) floor((log( (double) n) / log( 1/alpha)));
+    return (long long int) floor((log( (double) n) / log( (1/alpha) )));
 }
 
 long long int dfscount(Node* node){
@@ -130,7 +135,7 @@ res* sgins(Node* root, long long int depth, long long int n, double alpha, long 
         r->node = node;
         r->n_nodes = 1;
         r->newtam=1;
-        r->needrebuild = depth > halpha(n+1, alpha);
+        r->needrebuild = (depth > halpha(n+1, alpha));
         r->dist = 0;
         return r;
     }else if(key==root->key){
@@ -139,29 +144,25 @@ res* sgins(Node* root, long long int depth, long long int n, double alpha, long 
         r->newtam = -1;
         r->needrebuild = 0;
         r->dist=-1;
+        d1=-1;d2=-1;
         return r;
     }else if(key < root->key){
+        d1++;
         r = sgins(root->left, depth+1, n, alpha, key);
         root->left = r->node;
-        //cout << root->key <<" "<<root->left->key<<"\n";
-        nroot = r->needrebuild==1 ? 1 + r->newtam + dfscount(root->right) : -1;
+        nroot = r->needrebuild != 0 ? 1 + r->newtam + dfscount(root->right) : -1;
     }else{
+        d1++;
         r = sgins(root->right, depth+1, n, alpha, key);
         root->right = r->node;
-        // não seria dfscoutn(root->left) ???????
-        nroot = r->needrebuild==1 ? 1 + r->newtam + dfscount(root->left) : -1;
+        nroot = r->needrebuild !=1 ? 1 + r->newtam + dfscount(root->left) : -1;
     }
 
     r->dist = r->dist+1;
     //cout << root->key <<" "<<root->left->key<<"\n";
     if(r->needrebuild && unbalanced(alpha, nroot, r->dist)){
-        cout<<"rebuilding\n";
+        
         r->node =  rebuild(root, nroot);
-        cout<<"re:\n";
-        show(r->node);
-        cout<<"\n";
-        show2(r->node);
-        cout<<"\ner\n";
         r->n_nodes = r->n_nodes;
         r->newtam = nroot;
         r->needrebuild = 0;
@@ -176,36 +177,78 @@ res* sgins(Node* root, long long int depth, long long int n, double alpha, long 
 }
 
 void sginsert(sgtree* sg, long long int key){
+    d1=0;
     res *re  = sgins(sg->root, 0, sg->size, sg->alpha, key);
     sg->root = r->node;
     sg->size = sg->size + r->n_nodes;
 }
 
+void query(Node *root, long long int key){
+    if(root==NULL){
+        d2=-1;
+        return;
+    }
+    if(root->key==key){
+        return;
+    }
+    d2++;
+    if(root->key < key){
+        query(root->right, key);
+    }else{
+        query(root->left, key);
+    }
+}
+void sgquery(sgtree* sg, long long int key){
+    d2=0;
+    query(sg->root, key);
+}
+class Rng{
+    public:
+        long long int x;
+        long long int next(){
+            long long int b =x; 
+            x = (A*x + C) % R;
+            return b;
+        }
+};
 int main(){
-    sgtree sgt;
-
-    sgt.alpha = 0.6;
+    long long int S,U,B,N,I,Q,P;
+    double alpha;
     
-    sginsert(&sgt, 3);
-    sginsert(&sgt, 1);
-    sginsert(&sgt, 8);
-
-    sginsert(&sgt, 2);
-    sginsert(&sgt, 4);
-    sginsert(&sgt, 9);
-
-    sginsert(&sgt, 5);
-    sginsert(&sgt, 7);
-    show(sgt.root);
-    cout<<"\n";
-    show2(sgt.root);
-    cout<<"\n";
-
-    sginsert(&sgt, 6);
-    show(sgt.root);
-    cout<<"\n";
-    show2(sgt.root);
-    cout<<"\n";
-    cout<<"\n";
+    scanf(" %lld", &S);
+    scanf(" %lld", &U);
+    scanf(" %lf", &alpha);
+    scanf(" %lld", &B);
+    scanf(" %lld", &N);
+    scanf(" %lld", &I);
+    scanf(" %lld", &Q);
+    scanf(" %lld", &P);
     
+    Rng  rng;
+    rng.x = S;
+    sgtree sg;
+    sg.alpha = alpha;
+    for(long long int i=0 ; i < B ; i++){
+        sginsert(&sg, rng.next()%U);
+    }
+    long long int x,y;
+    for(long long int i=0; i < N; i++){
+        x = rng.next()%(I+Q);
+        if( x < I){
+            y = rng.next() % U;
+            sginsert(&sg, y);
+            sgquery(&sg, y);
+            if(d1 < 0 || d2<0){
+                d1=d2=-1;
+            }
+            if(i%P==0){
+                cout<<"I "<<y<<" "<<d1<<" "<<d2<<"\n"; 
+            }
+        }else{
+            sgquery(&sg, rng.next() % U);
+            if(i%P==0){
+                cout<<"Q "<<y<<" "<<d2<<"\n";
+            }
+        }
+    }
 }

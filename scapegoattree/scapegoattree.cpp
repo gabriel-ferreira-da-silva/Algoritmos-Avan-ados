@@ -87,7 +87,6 @@ vector<long long int> getv(Node* root){
     getflat(root,v);
     return *v;
 }
-long long int universal=0;
 Node* flat(Node* root,Node *p){
     vector<long long int> f = getv(root);
     //cout<<"merda\n";
@@ -95,7 +94,6 @@ Node* flat(Node* root,Node *p){
         //cout<<f[i] <<" ";
         p =  insert(p,f[i]);
     }
-    universal = f.size();
     p = insert(p,9999999999);
     /*cout<<"ixi\n";
     show(p);
@@ -128,19 +126,11 @@ Node* build(Node* head, long long int n){
         return head;
     }
     long long int nleft, nright;
-    double in;
-    in = (((double) n) - 1.0)/2.0; 
-    nleft = (long long int) ceil(in);
-    nright = (long long int) floor(in);
-    /*
-    cout<<"  n-1/2= "<<in <<"\n";
-    cout<<"  floor:"<<floor(in)<<" ceil:"<<ceil(in)<<"\n";
-    cout<<"  inbuild nleft:"<<nleft<<" nright:"<<nright<<"\n";
-    cout<<"  inbuild nleft:"<<nleft<<" nright:"<<nright<<"\n";
-    cout<<"  n="<<n<<"\n";*/
-    Node* mid = NULL; 
+    nleft = (long long int) ceil((n-1)/2);
+    nright = (long long int) floor((n-1)/2);
+    Node* mid = new Node; 
     mid = build(head, nleft);
-    Node* handle= NULL;
+    Node* handle= new Node;
     handle = build(mid->right, nright);
     mid->right = handle->left;
     handle->left = mid;
@@ -165,9 +155,10 @@ Node* flat(Node* root){
 */
 Node* rebuild(Node* root, long long int n){
     Node *dummy = new Node;
+    //Node *head = flatten(root, dummy);
     Node *head=NULL;
     head = flat(root, head);
-    Node *res = (build(head, universal));
+    Node *res = (build(head, n));
     return res->left;
 }
 
@@ -192,9 +183,6 @@ class res{
 };
 res sgins(Node* root, long long int depth, long long int n, double alpha, long long int key){
     res r;
-    cout<<"  n = "<<n<<"\n";
-    cout<<"  key = "<<key<<"\n";
-    cout<<"  depth ="<<depth<<"\n";
     long long nroot;
     if(root==NULL){
         Node *node = new Node;
@@ -224,19 +212,14 @@ res sgins(Node* root, long long int depth, long long int n, double alpha, long l
     }
     r.dis = r.dis+1;
     if(r.rebuild && unbalanced(alpha, nroot, r.dis)){
-        cout<<" rb::\n";
-        cout<<"  n = "<<n<<"\n";
-        cout<<"  key = "<<key<<"\n";
-        cout<<"  depth ="<<depth<<"\n";
-        cout<<"  nroot ="<<nroot<<"\n---rb\n";
+        /*cout<<"\n\nrebuilding:\n";
+        show(root);
+        cout<<"\n";*/
         r.node = rebuild(root, nroot);
         r.n_node = r.n_node;
         r.tam = nroot;
         r.rebuild  = 0;
         r.dis=-1;
-        /*cout<<"rebuilded:";
-        show(r.node);
-        cout<<"\nre\n";*/
         return r;
     }
     r.node = root;
@@ -280,34 +263,117 @@ void flatten1(Node* root)
 }
 
 
-int count(vector<long long int> v, long long int s){
-    for(int i=0;i<v.size();i++){
-        if(v[i]==s){
-            return 0;
-        }
-    }
-    return 1;
-}
+
 int main(){
-
+    Node *root=NULL;
+    Node *head;
+    Node *dummy = new Node;
+    root = insert(root, 4);
+    root = insert(root, 2);
+    root =insert(root, 1);
+    root =insert(root, 3);
+    root =insert(root, 5);
+    root =insert(root, 6);
+    root =insert(root, 7);
+    /*
+    show(root);
+    cout<<"\n";
+    root = flatten(root, dummy);
+    show3(root);
+    */
     Tree t;
-    long long int s=123;
     t.alpha = 0.5;
-    vector<long long int> v;
-    for(int i=0; i<20;i++){
-        s= (144444417*s + 391715171 )% 100;
-        if(count(v, s)){
-            v.push_back(s);
-            //cout<<s<<" ";
-        }
-        sginsert(&t,s);
-    }
-    cout<<"\n\n";
+    
+    sginsert(&t, 10);
     show(t.root);
-}
-/*
-36 22 3 2 16 5 25 23 63 45 42 43 62 56 76 65 82 
-63 36 16 3 2 5 23 22 25 45 42 43 62 56 83 76 65 82 96 85
-36 22 3 2 16 5 25 23 63 45 42 43 62 56 76 65 82 
+    cout<<"\n";
+    sginsert(&t, 1);
+    show(t.root);
+    cout<<"\n";
+    sginsert(&t, 4);
+    show(t.root);
+    cout<<"\n";
+    sginsert(&t, 20);
+    show(t.root);
+    cout<<"\n";
+    sginsert(&t, 8);
+    show(t.root);
+    cout<<"\n";
+    sginsert(&t, 25);
+    show(t.root);
+    cout<<"\n";
+    sginsert(&t, 43);
+    show(t.root);
+    cout<<"\n";
+    sginsert(&t, 18);
+    show(t.root);
+    cout<<"\n";
+    sginsert(&t, 3);
+    show(t.root);
+    cout<<"\n";
 
-*/
+    sginsert(&t, 143);
+    show(t.root);
+    cout<<"\n";
+    sginsert(&t, 180);
+    show(t.root);
+    cout<<"\n";
+    sginsert(&t, 343);
+    show(t.root);
+    cout<<"\n";
+    sginsert(&t,8663);
+    show(t.root);
+    cout<<"\n";
+    /*
+    Tree hope;
+
+    
+    hope.root = insert(hope.root,3);
+    hope.root = insert(hope.root,6);
+    hope.root = insert(hope.root,1);
+    hope.root = insert(hope.root,2);
+    hope.root = insert(hope.root,7);
+    hope.root = insert(hope.root,4);
+    hope.root = insert(hope.root,5);
+    
+    hope.root = insert(hope.root,1000);
+
+    cout<<"\n\n\n\n";
+    show(hope.root);
+    cout<<"\n\n\n\n";
+    //hope.root = build(hope.root, 8)->left;
+    Node *no =NULL;
+    myflaterr(hope.root);
+    cout<<"xixicoco\n";
+    show(nn);
+    */
+
+   Tree i;
+   i.root = insert(i.root, 56);
+   i.root = insert(i.root, 3);
+   i.root = insert(i.root, 10);
+   i.root = insert(i.root, 331);
+   i.root = insert(i.root, 106);
+   i.root = insert(i.root, 103);
+   i.root = insert(i.root, 51);
+   i.root = insert(i.root, 116);
+
+   Tree p;  
+   /*vector<long long int> f = getv(i.root);
+   cout<<"\n\n\nnexnextnext\n";
+   for(long int i=0;i<f.size();i++){
+    p.root = insert(p.root, f[i]);
+   }*/
+   p.root=NULL;
+   p.root = flat(i.root, p.root);
+   cout<<"\n\n\nnn\n";
+   show(i.root);
+   cout<<"\nasd\n";
+   show(p.root);
+   p.root = build(p.root, 8);
+   cout<<"\n";
+   show(p.root);
+   
+
+
+}
