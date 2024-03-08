@@ -138,7 +138,7 @@ Node* build(Node* head, long long int n){
     double in;
     in = (((double) n) - 1.0)/2.0; 
     nleft = (long long int) ceil(in);
-    nright = (long long int) floor(in);
+    nright = n-1 - nleft;
     /*
     cout<<"  n-1/2= "<<in <<"\n";
     cout<<"  floor:"<<floor(in)<<" ceil:"<<ceil(in)<<"\n";
